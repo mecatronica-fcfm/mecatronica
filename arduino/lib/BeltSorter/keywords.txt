@@ -1,0 +1,15 @@
+# Datatypes (KEYWORD1)
+BeltSorter
+
+# Methods and Functions (KEYWORD2)
+loop
+setOffsetServo1
+setOffsetServo2
+setServo1
+setServo2
+getHeight
+setBeltConstant
+getBeltDistance
+getBeltSpeed
+waitForPeriod
+setPeriod
