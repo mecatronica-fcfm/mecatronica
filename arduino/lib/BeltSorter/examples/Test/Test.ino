@@ -26,11 +26,11 @@ void loop()
     // Print belt speed
     Serial.print("Belt speed: ");
     Serial.print(bs.getBeltSpeed());
-    Serial.println(" [cm/s]");
+    Serial.print(" [cm/s] | ");
     // Print Height sensor value
     Serial.print("Height: ");
     Serial.print(bs.getHeight());
     Serial.println(" [mm]");
-    delay(10);
+    bs.sleep();
   }
 }

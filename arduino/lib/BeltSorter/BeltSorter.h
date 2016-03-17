@@ -70,7 +70,7 @@ private:
 
   const uint16_t _urMaxRange = 1040U; // Maximum range needed
   const uint16_t _urMinRange = 500U; // Minimum range needed
-  const float _encoderConstant = 550.0f;
+  const float _encoderConstant = 5500.0f;
 
 };
 
