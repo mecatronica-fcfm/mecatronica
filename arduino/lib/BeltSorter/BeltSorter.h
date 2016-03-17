@@ -8,17 +8,17 @@
 #include "Arduino.h"
 #include <Servo.h>
 
-#define BELTSORTER_ECHO_PIN       7 // Echo Pin
-#define BELTSORTER_TRIGGER_PIN    4 // Trigger Pin
-#define BELTSORTER_LED_PIN        13 // Onboard LED
+#define BELTSORTER_ECHO_PIN     7  // Echo Pin
+#define BELTSORTER_TRIGGER_PIN  4  // Trigger Pin
+#define BELTSORTER_LED_PIN      13 // Onboard LED
 
-#define BELTSORTER_ENCODER_PIN    2 // Onboard LED
+#define BELTSORTER_ENCODER_PIN  2  // Onboard LED
 
-#define BELTSORTER_PUSHER1_PIN     5 
-#define BELTSORTER_PUSHER2_PIN     3     
+#define BELTSORTER_PUSHER1_PIN  5 
+#define BELTSORTER_PUSHER2_PIN  3     
 
-#define BELTSORTER_ANALOG_PIN     0 
-#define BELTSORTER_BELT_PIN       6
+#define BELTSORTER_ANALOG_PIN   0 
+#define BELTSORTER_BELT_PIN     6
 
 class Pusher
 {
@@ -39,7 +39,9 @@ class BeltSorter
 
 public:
   BeltSorter();
-  void spin();
+  void begin();
+  void loop();
+  
   // Pusher functions
   void openPusherA();
   void openPusherB();
@@ -49,24 +51,26 @@ public:
   float getHeight();
   float getBeltDistance();
   float getBeltSpeed();
-  void waitForPeriod();
+  void sleep();
   void setPeriod(unsigned long period_us);
-  void begin();
+  
 
 private:
+  uint32_t _urDuration;
+  uint32_t _encoderPeriod;
+  uint32_t _beltLastTime;
+  uint32_t _period;
+  uint32_t _lastPeriod;
+  float _urHeight;
+  float _beltSpeed;
+  float _beltLastDistance;
+  
   Pusher _pusherA;
   Pusher _pusherB;
-  const int _max_range = 1040; // Maximum range needed
-  const int _min_range = 500; // Minimum range needed
-  long beltsorter_duration;
-  float beltsorter_distance; // Duration used to calculate distance
-  unsigned long beltsorter_belt_period;
-  unsigned long beltsorter_last_time;
-  unsigned long beltsorter_period;
-  unsigned long beltsorter_last_period;
-  const float _encoder_constant;
-  float beltsorter_belt_speed;
-  float beltsorter_belt_last_distance;
+
+  const uint16_t _urMaxRange = 1040U; // Maximum range needed
+  const uint16_t _urMinRange = 500U; // Minimum range needed
+  const float _encoderConstant = 550.0f;
 
 };
 

@@ -22,7 +22,7 @@ void loop()
   
   while(true)
   {
-    bs.spin();
+    bs.loop();
     // Print belt speed
     Serial.print("Belt speed: ");
     Serial.print(bs.getBeltSpeed());
