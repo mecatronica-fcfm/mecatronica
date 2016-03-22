@@ -73,7 +73,8 @@ void BeltSorter::loop()
   // Saturation range
   _urDuration = _urDuration > _urMaxRange ? _urMaxRange : (_urDuration < _urMinRange ? _urMinRange : _urDuration);
   // Calc object height (empirical constants)
-  _urHeight = 175.0f - (float)_urDuration/5.9f;
+  _urHeight = 239.0f - (float)_urDuration/5.9f;
+  _urHeight = _urHeight < 0.0f ? 0.0f : _urHeight;
   
   // Encoder
   _encoderPeriod = pulseIn(BELTSORTER_ENCODER_PIN,HIGH,10000);

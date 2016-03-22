@@ -68,7 +68,7 @@ private:
   Pusher _pusherA;
   Pusher _pusherB;
 
-  const uint16_t _urMaxRange = 1040U; // Maximum range needed
+  const uint16_t _urMaxRange = 1500U; // Maximum range needed
   const uint16_t _urMinRange = 500U; // Minimum range needed
   const float _encoderConstant = 5500.0f;
 
