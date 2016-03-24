@@ -5,11 +5,14 @@
 #ifndef BeltSorter_h
 #define BeltSorter_h
 
-#include "Arduino.h"
+#include <Arduino.h>
 #include <Servo.h>
+#include <NewPing.h>
 
 #define BELTSORTER_ECHO_PIN     7  // Echo Pin
 #define BELTSORTER_TRIGGER_PIN  4  // Trigger Pin
+#define BELTSORTER_MAX_DISTANCE 20 // Sonar max distance
+
 #define BELTSORTER_LED_PIN      13 // Onboard LED
 
 #define BELTSORTER_ENCODER_PIN  2  // Onboard LED
@@ -67,9 +70,8 @@ private:
   
   Pusher _pusherA;
   Pusher _pusherB;
+  NewPing _sonar;
 
-  const uint16_t _urMaxRange = 1500U; // Maximum range needed
-  const uint16_t _urMinRange = 500U; // Minimum range needed
   const float _encoderConstant = 5500.0f;
 
 };

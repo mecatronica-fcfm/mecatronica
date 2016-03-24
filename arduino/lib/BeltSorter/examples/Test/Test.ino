@@ -1,5 +1,6 @@
 #include <BeltSorter.h>
 #include <Servo.h>
+#include <NewPing.h>
 
 BeltSorter bs;
 

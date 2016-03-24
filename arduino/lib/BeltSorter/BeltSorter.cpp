@@ -41,7 +41,8 @@ BeltSorter::BeltSorter():
   _beltSpeed(0.0f),
   _beltLastDistance(0.0f),
   _pusherA(90,5),
-  _pusherB(90,175)
+  _pusherB(90,175),
+  _sonar(BELTSORTER_TRIGGER_PIN, BELTSORTER_ECHO_PIN, BELTSORTER_MAX_DISTANCE)
 {
   // Pin config
   pinMode(BELTSORTER_TRIGGER_PIN, OUTPUT);
@@ -68,12 +69,8 @@ void BeltSorter::loop()
   digitalWrite(BELTSORTER_TRIGGER_PIN, HIGH);
   delayMicroseconds(10); 
   digitalWrite(BELTSORTER_TRIGGER_PIN, LOW);
-  // Meeasure distance
-  _urDuration = pulseIn(BELTSORTER_ECHO_PIN, HIGH);
-  // Saturation range
-  _urDuration = _urDuration > _urMaxRange ? _urMaxRange : (_urDuration < _urMinRange ? _urMinRange : _urDuration);
-  // Calc object height (empirical constants)
-  _urHeight = 239.0f - (float)_urDuration/5.9f;
+  // Measure distance
+  _urHeight = 190.0f - (float)_sonar.ping()/5.7f;
   _urHeight = _urHeight < 0.0f ? 0.0f : _urHeight;
   
   // Encoder

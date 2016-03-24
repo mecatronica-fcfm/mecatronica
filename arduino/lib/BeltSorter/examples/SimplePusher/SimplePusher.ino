@@ -1,5 +1,6 @@
 #include <BeltSorter.h>
 #include <Servo.h>
+#include <NewPing.h>
 
 BeltSorter bs;
 
@@ -16,6 +17,7 @@ void loop()
   bs.openPusherA();
   bs.openPusherB();
   Serial.println("Opening pushers");
+  delay(1000);
 
   while(true)
   {
