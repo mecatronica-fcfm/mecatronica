@@ -1,0 +1,6 @@
+uint8 left_hip_angle
+uint8 left_knee_angle
+uint8 left_ankle_angle
+uint8 right_hip_angle
+uint8 right_knee_angle
+uint8 right_ankle_angle

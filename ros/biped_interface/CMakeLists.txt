@@ -6,9 +6,21 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   sensor_msgs
   tf
+  message_generation
 )
 
 catkin_python_setup()
+
+add_message_files(
+  FILES
+  ServoArray.msg
+)
+
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
 
 catkin_package(
   CATKIN_DEPENDS
@@ -16,6 +28,10 @@ catkin_package(
     geometry_msgs
     sensor_msgs
     tf
+    message_runtime
   DEPENDS
     python_orocos_kdl
 )
+
+
+
