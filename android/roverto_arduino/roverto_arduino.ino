@@ -5,9 +5,9 @@
 USB Usb;
 ADK adk(&Usb, "Mecatronica", // Manufacturer Name
               "roverto", // Model Name
-              "Example sketch for the USB Host Shield", // Description (user-visible string)
+              "Rover controller using cellular network", // Description (user-visible string)
               "1.0", // Version
-              "http://www.tkjelectronics.dk/uploads/ArduinoBlinkLED.apk", // URL (web page to visit if no installed apps support the accessory)
+              "https://github.com/mecatronica-fcfm", // URL (web page to visit if no installed apps support the accessory)
               "123456789"); // Serial Number (optional)
 
 uint32_t timer;
