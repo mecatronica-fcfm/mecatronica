@@ -58,6 +58,9 @@ public class MainActivity extends Activity {
     private RovertoSocketService mRovertoSocketService;
     private boolean mIsBound;
 
+    // Communication bridge
+    private CommunicationBridge mCommBridge;
+
     private ToggleButton ledToggleButton;
     private OnCheckedChangeListener ledButtonStateChangeListener = new LedStateChangeListener();
 
@@ -65,16 +68,9 @@ public class MainActivity extends Activity {
 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            byte msg = (byte) (isChecked ? 1 : 0);
+            int cmd = isChecked ? 1 : 0;
             String toastMsg = (isChecked ? "LED ON" : "LED OFF");
-            if (mOutputStream != null) {
-                try {
-                    mOutputStream.write(msg);
-                } catch (IOException e) {
-                    if (D)
-                        Log.e(TAG, "write failed", e);
-                }
-            }
+            usbCommunication.write(cmd);
             Toast.makeText(MainActivity.this, toastMsg, Toast.LENGTH_SHORT).show();
         }
     }
@@ -127,6 +123,9 @@ public class MainActivity extends Activity {
             usbCommunication.start();
 
             setConnectionStatus(true);
+
+            mCommBridge = new CommunicationBridge();
+            mCommBridge.start();
 
             if (D)
                 Log.d(TAG, "Accessory opened");
@@ -216,6 +215,17 @@ public class MainActivity extends Activity {
             return msg;
         }
 
+        public void write(int data){
+            if (mOutputStream != null) {
+                try {
+                    mOutputStream.write(data);
+                } catch (IOException e) {
+                    if (D)
+                        Log.e(TAG, "write failed", e);
+                }
+            }
+        }
+
         public int available() {
             return receivedQueue.size();
         }
@@ -259,6 +269,38 @@ public class MainActivity extends Activity {
             // Detach our existing connection.
             unbindService(mConnection);
             mIsBound = false;
+        }
+    }
+
+    /**
+     * Communication bridge between USB and Socket
+     */
+    class CommunicationBridge extends Thread{
+        // Running flag
+        private boolean running;
+
+        public CommunicationBridge(){
+            running = true;
+        }
+
+        public void run(){
+            while(running){
+                // Check socket service and usb communication
+                if (mRovertoSocketService != null && usbCommunication !=null){
+                    // Read socket and write to usb
+                    if (mRovertoSocketService.available()>0){
+                        usbCommunication.write(mRovertoSocketService.read());
+                    }
+                    // Read data from usb and write socket
+                    if (usbCommunication.available()>0){
+                        mRovertoSocketService.write(usbCommunication.read());
+                    }
+                }
+            }
+        }
+        // Stop thread execution
+        public void cancel(){
+            running = false;
         }
     }
 

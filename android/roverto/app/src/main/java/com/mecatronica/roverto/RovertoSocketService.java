@@ -33,6 +33,12 @@ public class RovertoSocketService extends Service {
     private OutputStream mOutputStream;
     // Socket thread management
     SocketCommunication mSocketComm;
+    // Communication Queues
+    BlockingQueue<Integer> mReceivedQueue = new LinkedBlockingQueue<Integer>();
+    BlockingQueue<Integer> mToSendQueue = new LinkedBlockingQueue<Integer>();
+    // Min and max values
+    public static final int MIN_VALUE = 0;
+    public static final int MAX_VALUE = 255;
     // Server data
     private static final int SERVER_PORT = 3500;
     private static final String SERVER_NAME = "intermedio.ddns.net";
@@ -56,8 +62,7 @@ public class RovertoSocketService extends Service {
 
     class SocketCommunication extends Thread {
 
-        BlockingQueue<Integer> mReceivedQueue = new LinkedBlockingQueue<Integer>();
-        BlockingQueue<Integer> mToSendQueue = new LinkedBlockingQueue<Integer>();
+        // Running flag
         boolean running;
 
         SocketCommunication(){
@@ -94,7 +99,7 @@ public class RovertoSocketService extends Service {
                             Integer write_data = null;
                             try {
                                 // Get data from queue
-                                write_data = this.mToSendQueue.poll(1, TimeUnit.MILLISECONDS);
+                                write_data = mToSendQueue.poll(1, TimeUnit.MILLISECONDS);
                                 // Write de data in the stream
                                 if (write_data != null) {
                                     Log.d(TAG, "Write data to socket: " + write_data.toString());
@@ -118,28 +123,48 @@ public class RovertoSocketService extends Service {
             }
         }
 
-        public int read() {
-            Integer data = null;
-            try {
-                data = this.mReceivedQueue.poll(1, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                Log.d(TAG, "InterruptedException getting data");
-            }
-            return data.intValue();
-        }
-
-        public void write(int data) {
-            mToSendQueue.add(new Integer(data));
-        }
-
-        public int available() {
-            return mReceivedQueue.size();
-        }
-
         public void cancel() {
             running = false;
         }
     }
+
+    /*
+     * Communication methods
+     */
+    public int read() {
+        Integer data = null;
+        try {
+            data = mReceivedQueue.poll(1, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Log.d(TAG, "InterruptedException getting data");
+        }
+        return data.intValue();
+    }
+
+    public void write(int data) {
+        // Saturation using min and max values
+        data = data<MIN_VALUE ? MIN_VALUE : (data>MAX_VALUE ? MAX_VALUE : data);
+        mToSendQueue.add(new Integer(data));
+    }
+
+    public void write(RovertoStatus st){
+        this.write(255);
+        this.write(255);
+        int sum = 0;
+        int data;
+        for (int i = 0; i < RovertoStatus.MESSAGE_SIZE; i++) {
+            data = st.data[i];
+            sum += data;
+            this.write(data);
+        }
+        this.write(sum%255);
+    }
+
+    public int available() {
+        return mReceivedQueue.size();
+    }
+
+
 
     @Override
     public void onDestroy() {
