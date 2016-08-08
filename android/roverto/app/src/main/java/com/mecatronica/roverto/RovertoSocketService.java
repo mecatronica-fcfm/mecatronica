@@ -102,7 +102,7 @@ public class RovertoSocketService extends Service {
                                 write_data = mToSendQueue.poll(1, TimeUnit.MILLISECONDS);
                                 // Write de data in the stream
                                 if (write_data != null) {
-                                    Log.d(TAG, "Write data to socket: " + write_data.toString());
+                                    //Log.d(TAG, "Write data to socket: " + write_data.toString());
                                     mOutputStream.write(write_data.intValue());
                                     mOutputStream.flush();
                                 }

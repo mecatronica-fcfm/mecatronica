@@ -2,6 +2,8 @@ package com.mecatronica.roverto;
 
 import android.content.ComponentName;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
@@ -18,10 +20,12 @@ import android.content.IntentFilter;
 
 import android.util.Log;
 
+import android.view.View;
 import android.widget.TextView;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ToggleButton;
+import android.widget.Button;
 import android.widget.Toast;
 
 import android.hardware.usb.UsbAccessory;
@@ -56,11 +60,19 @@ public class MainActivity extends Activity {
 
     // Socket service
     private RovertoSocketService mRovertoSocketService;
-    private boolean mIsBound;
+    private boolean mIsScoketBound;
+
+    // Camera service
+    private SimpleCamera2ServicePublish mCamera;
+    private boolean mIsCameraBound;
 
     // Communication bridge
     private CommunicationBridge mCommBridge;
 
+    private static final int CAMERA_REQUEST = 1888;
+
+    // UI
+    private Button mImgButton;
     private ToggleButton ledToggleButton;
     private OnCheckedChangeListener ledButtonStateChangeListener = new LedStateChangeListener();
 
@@ -239,7 +251,7 @@ public class MainActivity extends Activity {
     /**
      * Socket communication management
      */
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private ServiceConnection mSocketConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(TAG, "Call onServiceConnected");
@@ -258,17 +270,53 @@ public class MainActivity extends Activity {
         }
     };
 
-    private void doBindService() {
-        Log.i(TAG, "Call doBindService");
-        bindService(new Intent(this, RovertoSocketService.class), mConnection, Context.BIND_AUTO_CREATE);
-        mIsBound = true;
+    private void doBindSocketService() {
+        Log.i(TAG, "Call doBindSocketService");
+        bindService(new Intent(this, RovertoSocketService.class), mSocketConnection, Context.BIND_AUTO_CREATE);
+        mIsScoketBound = true;
     }
 
-    private void doUnbindService() {
-        if (mIsBound) {
+    private void doUnbindSocketService() {
+        if (mIsScoketBound) {
             // Detach our existing connection.
-            unbindService(mConnection);
-            mIsBound = false;
+            unbindService(mSocketConnection);
+            mIsScoketBound = false;
+        }
+    }
+
+    /**
+     * Camera communication management
+     */
+    private ServiceConnection mCameraConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "Camera: Call onServiceConnected");
+            SimpleCamera2ServicePublish.LocalBinder binder=(SimpleCamera2ServicePublish.LocalBinder)service;
+            mCamera=binder.getService();
+
+            if(mCamera != null) {
+                Log.i(TAG, "Service is bonded successfully!");
+            }else{
+                Log.e(TAG, "Service null");
+            }
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mCamera = null;
+        }
+    };
+
+    private void doBindCammeraService() {
+        Log.i(TAG, "Call doBindCameraService");
+        bindService(new Intent(this, SimpleCamera2ServicePublish.class), mCameraConnection, Context.BIND_AUTO_CREATE);
+        mIsCameraBound = true;
+    }
+
+    private void doUnbindCameraService() {
+        if (mIsCameraBound) {
+            // Detach our existing connection.
+            unbindService(mCameraConnection);
+            mIsCameraBound = false;
         }
     }
 
@@ -325,19 +373,51 @@ public class MainActivity extends Activity {
         // Add event
         ledToggleButton.setOnCheckedChangeListener(ledButtonStateChangeListener);
 
+        // Send image button
+        mImgButton = (Button) findViewById(R.id.uiImgButton);
+        // Image button event
+        mImgButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mCamera!=null){
+                    int[] data = mCamera.getImage();
+                    Log.i(TAG, Arrays.toString(data));
+                    sendPhoto(data);
+                }
+            }
+        });
+
         Log.d(TAG, "Send intent to RovertoSocketService");
         startService(new Intent(this, RovertoSocketService.class));
-        doBindService();
+        doBindSocketService();
 
-
+        Log.d(TAG, "Send intent to CameraService");
+        startService(new Intent(this, SimpleCamera2ServicePublish.class));
+        doBindCammeraService();
     }
+
+
+    protected void sendPhoto(int[] data)
+    {
+        if (mRovertoSocketService == null) return;
+        for(int i=0; i<data.length; ++i)
+        {
+                mRovertoSocketService.write(data[i]);
+        }
+    }
+
+
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        doUnbindService();
+        doUnbindSocketService();
+        doUnbindCameraService();
         closeAccessory();
         unregisterReceiver(mUsbReceiver);
+        // Close services
+        stopService(new Intent(this, RovertoSocketService.class));
+        stopService(new Intent(this, SimpleCamera2ServicePublish.class));
     }
 
     @Override
