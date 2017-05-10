@@ -17,6 +17,8 @@ Servo leftAnkleServo;
 Servo rightHipServo;
 Servo rightKneeServo;
 Servo rightAnkleServo;
+
+#define RA rightAnkleServo
    
 void messageCb( const c_msg::ServoArray& msg)
 {
@@ -26,7 +28,7 @@ void messageCb( const c_msg::ServoArray& msg)
   rightHipServo.write(msg.right_hip_angle);
   
   rightKneeServo.write(msg.right_knee_angle);
-  rightAnkleServo.write(msg.right_ankle_angle);
+  RA.write(msg.right_ankle_angle);
   digitalWrite(7,msg.enable);
 }
    
@@ -47,7 +49,7 @@ void setup()
   
   rightHipServo.attach(6);
   rightKneeServo.attach(5);
-  rightAnkleServo.attach(3);
+  RA.attach(3);
 }
    
 void loop()

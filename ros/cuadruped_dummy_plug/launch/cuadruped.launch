@@ -1,0 +1,7 @@
+<launch>
+	<node name="cuadruped_rosserial" pkg="rosserial_python" type="serial_node.py" output="screen">
+    	<param name="port" value="/dev/ttyACM0"/>
+  	</node>
+  	<node name="cuadruped_dummy_plug" pkg="cuadruped_dummy_plug" type="cuadruped_dummy_plug_node.py" output="screen" />
+
+</launch>
