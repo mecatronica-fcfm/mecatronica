@@ -14,7 +14,7 @@
 import rospy
 from std_msgs.msg import String
 from Tkinter import *
-from c_msg.msg import ServoArray
+from c_msg.msg import ServoArray_quadruped
 
 
 
@@ -49,7 +49,7 @@ def callback_right_front_knee(value):
 	return
 
 def callback_right_front_ankle(value):
-	msg_servo_array.right_ankle_angle = int(value)
+	msg_servo_array.right_front_ankle_angle = int(value)
 	pub_servo_array.publish(msg_servo_array)
 	rospy.loginfo("Dummy: Right Front Ankle: %d !", int(value))
 	return
@@ -105,7 +105,7 @@ def callback_enable(value):
 rospy.init_node('biped_dummy_plug_node', anonymous=True)
 
 #Create dummy msg objects
-msg_servo_array = ServoArray()
+msg_servo_array = ServoArray_quadruped()
 msg_servo_array.left_front_hip_angle    = 128
 msg_servo_array.left_front_knee_angle   = 128
 msg_servo_array.left_front_ankle_angle  = 128
@@ -126,13 +126,13 @@ def quit(event):
     root.quit()
 
 #Create & Configure Publishers
-pub_servo_array = rospy.Publisher('biped_dummy_plug_node/t_servo_array', ServoArray, queue_size=10)
+pub_servo_array = rospy.Publisher('biped_dummy_plug_node/t_servo_array', ServoArray_quadruped, queue_size=10)
 
 #Create main window
 root = Tk()
 root.bind('<Control-c>', quit)
 root.minsize() #width=500, height=500
-root.wm_title("Biped - EVA-01 Dummy Plug")
+root.wm_title("Quadruped - EVA-01 Dummy Plug")
 
 #Create Main Frame Widget
 win = Frame(root)
@@ -145,8 +145,11 @@ frame_left_down =  LabelFrame(win, text='Left Back Foot', padx=5, pady=5)
 frame_right_down = LabelFrame(win, text='Right Back Foot', padx=5, pady=5)
 
 
-frame_left.pack(side=LEFT, expand=True, padx=10, pady=10, fill=BOTH)
-frame_right.pack(side=LEFT, expand=True, padx=10, pady=10, fill=BOTH)
+frame_left_up.pack(side=LEFT, expand=True, padx=10, pady=10, fill=BOTH)
+frame_right_up.pack(side=LEFT, expand=True, padx=10, pady=10, fill=BOTH)
+frame_left_down.pack(side=BOTTOM, expand=True, padx=10, pady=10, fill=BOTH)
+frame_right_down.pack(side=BOTTOM, expand=True, padx=10, pady=10, fill=BOTH)
+
 
 
 #Add Labels

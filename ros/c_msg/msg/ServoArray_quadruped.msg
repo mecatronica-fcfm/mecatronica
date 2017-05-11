@@ -1,0 +1,14 @@
+uint8 left_front_hip_angle
+uint8 left_front_knee_angle
+uint8 left_front_ankle_angle
+uint8 right_front_hip_angle
+uint8 right_front_knee_angle
+uint8 right_front_ankle_angle
+
+uint8 left_back_hip_angle
+uint8 left_back_knee_angle
+uint8 left_back_ankle_angle
+uint8 right_back_hip_angle
+uint8 right_back_knee_angle
+uint8 right_back_ankle_angle
+bool enable

@@ -23,6 +23,7 @@ add_message_files(
    ServoArray.msg
    sonar.msg
    sonar2.msg
+   ServoArray_quadruped.msg
 )
 
 generate_messages(
